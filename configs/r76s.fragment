@@ -1,0 +1,10 @@
+CONFIG_TARGET_rockchip=y
+CONFIG_TARGET_rockchip_armv8=y
+CONFIG_TARGET_rockchip_armv8_DEVICE_friendlyarm_nanopi-r76s=y
+CONFIG_TARGET_DEVICE_rockchip_armv8_DEVICE_friendlyarm_nanopi-r76s=y
+CONFIG_TARGET_MULTI_PROFILE=n
+CONFIG_TARGET_ALL_PROFILES=n
+CONFIG_TARGET_PER_DEVICE_ROOTFS=y
+CONFIG_PACKAGE_kmod-rknpu=y
+CONFIG_PACKAGE_luci=y
+CONFIG_PACKAGE_luci-base=y
