@@ -100,8 +100,12 @@ jobs:
           cd openwrt
           echo "start: $(date -u +%H:%M:%S)"
           if ! make -j"$(nproc)" > build.log 2>&1; then
-            echo "=== BUILD FAILED, last 200 lines ==="
-            tail -200 build.log
+            echo "=== BUILD FAILED at $(date -u +%H:%M:%S) ==="
+            df -h / | tail -2
+            echo "--- error lines (last 60) ---"
+            grep -n -iE "error:|Error [0-9]|failed|No space left|Killed|undefined reference" build.log | tail -60
+            echo "--- last 150 lines ---"
+            tail -150 build.log
             exit 1
           fi
           echo "done: $(date -u +%H:%M:%S)"
@@ -118,7 +122,7 @@ jobs:
           echo '```' >> "$GITHUB_STEP_SUMMARY"
           grep -E "kmod-rknpu|DEVICE_friendlyarm_nanopi-r76s|^CONFIG_PACKAGE_luci=y" openwrt/.config >> "$GITHUB_STEP_SUMMARY" 2>/dev/null || true
           echo '```' >> "$GITHUB_STEP_SUMMARY"
-          tail -200 openwrt/build.log > build-tail.log 2>/dev/null || true
+          tail -2000 openwrt/build.log > build-tail.log 2>/dev/null || true
 
       - name: Upload firmware
         if: always()
@@ -130,5 +134,6 @@ jobs:
             openwrt/bin/targets/rockchip/armv8/profiles.json
             openwrt/.config
             build-tail.log
+            openwrt/build.log
           if-no-files-found: warn
           retention-days: 30
