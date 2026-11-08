@@ -53,6 +53,7 @@ jobs:
             libncursesw5-dev libpython3-dev libreadline-dev libssl-dev libtool libyaml-dev \
             lld llvm lrzsz mkisofs msmtp nano ninja-build p7zip p7zip-full patch pkgconf \
             python3 python3-pip python3-ply python3-docutils python3-pkg-resources \
+            python3-pyelftools \
             qemu-utils re2c rsync scons squashfs-tools subversion swig texinfo uglifyjs \
             upx-ucl unzip vim wget xmlto xxd zlib1g-dev
           df -h / | tail -1
@@ -88,7 +89,11 @@ jobs:
       - name: Download package sources
         run: |
           cd openwrt
-          make download -j"$(nproc)" > download.log 2>&1 || make download -j1 V=s
+          if ! make download -j"$(nproc)" > download.log 2>&1; then
+            echo "=== download failed, last 120 lines ==="
+            tail -120 download.log
+            exit 1
+          fi
 
       - name: Build firmware
         run: |
