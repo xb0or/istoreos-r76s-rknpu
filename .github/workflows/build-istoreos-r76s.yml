@@ -64,13 +64,27 @@ jobs:
           cd openwrt
           git log --oneline -1
 
-      - name: Cache downloads
-        uses: actions/cache@v4
-        with:
-          path: openwrt/dl
-          key: dl-${{ env.ISTOREOS_REF }}-${{ hashFiles('configs/r76s.fragment') }}
-          restore-keys: |
-            dl-${{ env.ISTOREOS_REF }}-
+      - name: Offload heavy dirs to /mnt
+        run: |
+          set -e
+          echo "--- before ---"
+          df -h / /mnt 2>/dev/null | tail -4
+          avail=$(df --output=avail -BG /mnt 2>/dev/null | tail -1 | tr -dc '0-9')
+          echo "/mnt available: ${avail:-0}G"
+          if [ "${avail:-0}" -ge 20 ]; then
+            sudo mkdir -p /mnt/openwrt-dl /mnt/openwrt-build
+            sudo chown -R "$USER":"$USER" /mnt/openwrt-dl /mnt/openwrt-build
+            rm -rf openwrt/dl openwrt/build_dir
+            ln -s /mnt/openwrt-dl openwrt/dl
+            ln -s /mnt/openwrt-build openwrt/build_dir
+            echo "offloaded dl and build_dir to /mnt"
+          else
+            mkdir -p openwrt/dl openwrt/build_dir
+            echo "WARN: /mnt is small, keeping dirs on root fs"
+          fi
+          echo "--- after ---"
+          df -h / /mnt 2>/dev/null | tail -4
+          ls -ld openwrt/dl openwrt/build_dir
 
       - name: Update and install feeds
         run: |
