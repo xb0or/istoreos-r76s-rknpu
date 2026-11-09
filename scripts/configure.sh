@@ -14,6 +14,8 @@ required=(
   "CONFIG_TARGET_rockchip_armv8_DEVICE_friendlyarm_nanopi-r76s=y"
   "CONFIG_PACKAGE_kmod-rknpu=y"
   "CONFIG_PACKAGE_luci=y"
+  "CONFIG_TARGET_KERNEL_PARTSIZE=64"
+  "CONFIG_TARGET_ROOTFS_PARTSIZE=256"
 )
 
 missing=0

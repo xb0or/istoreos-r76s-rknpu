@@ -116,8 +116,10 @@ jobs:
           if ! make -j"$(nproc)" > build.log 2>&1; then
             echo "=== BUILD FAILED at $(date -u +%H:%M:%S) ==="
             df -h / | tail -2
+            echo "--- retry target/install with V=s (build_dir is warm) ---"
+            make -j1 V=s target/install 2>&1 | tail -300
             echo "--- error lines (last 60) ---"
-            grep -n -iE "error:|Error [0-9]|failed|No space left|Killed|undefined reference" build.log | tail -60
+            grep -n -iE "error:|Error [0-9]|failed|No space left|Killed|undefined reference|too big" build.log | tail -60
             echo "--- last 150 lines ---"
             tail -150 build.log
             exit 1
